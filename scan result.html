@@ -143,6 +143,34 @@ body {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
+  animation: fadeIn 0.8s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInFromTop {
+  from { transform: translateY(-100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slideInFromLeft {
+  from { transform: translateX(-50px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-10px); }
+  60% { transform: translateY(-5px); }
 }
 .scanner-card {
   background: white;
@@ -151,10 +179,17 @@ body {
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   width: 400px;
   text-align: center;
+  animation: slideInFromLeft 0.8s ease-out 0.2s both;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.scanner-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
 }
 h2 {
   margin-bottom: 16px;
   color: #333;
+  animation: fadeIn 1s ease-out 0.5s both;
 }
 #preview {
   width: 100%;
@@ -163,6 +198,11 @@ h2 {
   border-radius: 12px;
   margin-bottom: 12px;
   object-fit: cover;
+  transition: all 0.3s ease;
+}
+#preview:hover {
+  border-color: #15803d;
+  transform: scale(1.02);
 }
 input[type="file"] {
   display: none;
@@ -177,9 +217,31 @@ input[type="file"] {
   cursor: pointer;
   text-decoration: none;
   font-weight: bold;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+.btn:hover::before {
+  left: 100%;
 }
 .btn:hover {
   background: #1eb957;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(21, 128, 61, 0.3);
+}
+.btn:active {
+  transform: translateY(0);
+  animation: pulse 0.3s ease;
 }
 #result {
   margin-top: 15px;
@@ -188,6 +250,18 @@ input[type="file"] {
   border-radius: 8px;
   text-align: left;
   font-size: 14px;
+  transition: all 0.3s ease;
+  animation: fadeIn 0.5s ease-out;
+}
+#result.success {
+  background: #d4edda;
+  border-left: 4px solid #28a745;
+  animation: bounce 0.6s ease-out;
+}
+#result.error {
+  background: #f8d7da;
+  border-left: 4px solid #dc3545;
+  animation: bounce 0.6s ease-out;
 }
   </style>
 </head>
