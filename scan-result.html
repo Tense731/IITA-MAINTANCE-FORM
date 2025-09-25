@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scan Result</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html, body {
+      width: 100%;
+      overflow-x: hidden;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f3f6fb;
+      color: #333;
+      padding-top: 70px;
+      padding-bottom: 60px;
+      min-height: 100vh;
+    }
+
+    /* Navbar */
+    .navbar {
+      width: 100%;
+      background: linear-gradient(90deg, #e05206FF, #e05206FF);
+      padding: 12px 16px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+    .nav-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1100px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    .nav-container img {
+      height: 45px;
+      width: auto;
+    }
+    .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 20px;
+    }
+    .nav-links li { position: relative; }
+    .nav-links a {
+      text-decoration: none;
+      color: #fff;
+      font-weight: 500;
+      font-size: 15px;
+      padding: 6px 10px;
+      transition: color 0.3s ease;
+    }
+    .nav-links a:hover { color: #ffeaa7; }
+    .nav-links a::after {
+      content: "";
+      position: absolute;
+      width: 0;
+      height: 2px;
+      left: 0;
+      bottom: -3px;
+      background: #fff;
+      transition: width 0.3s ease-in-out;
+    }
+    .nav-links a:hover::after { width: 100%; }
+
+    /* Hamburger */
+    .hamburger {
+      display: none;
+      font-size: 26px;
+      color: #fff;
+      cursor: pointer;
+      border: none;
+      background: none;
+    }
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+        flex-direction: column;
+        background: #e05206FF;
+        position: absolute;
+        top: 60px;
+        right: 0;
+        width: 200px;
+        padding: 15px 0;
+        border-radius: 0 0 8px 8px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      }
+      .nav-links.show { display: flex; }
+      .hamburger { display: block; }
+    }
+
+    /* Main container */
+    .details-container {
+      max-width: 900px;
+      margin: 20px auto;
+      background: #fff;
+      padding: 20px 25px;
+      border-radius: 12px;
+      box-shadow: 0px 5px 18px rgba(0, 0, 0, 0.1);
+      width: 90%;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 22px;
+      color: #1d3557;
+      border-bottom: 2px solid #e5e5e5;
+      padding-bottom: 8px;
+    }
+    .detail {
+      margin-bottom: 10px;
+      padding: 8px 10px;
+      background: #f9f9f9;
+      border-left: 4px solid #e05206FF;
+      border-radius: 6px;
+      font-size: 14px;
+      word-wrap: break-word;
+    }
+    #direct-link {
+      display: inline-block;
+      margin-bottom: 20px;
+      font-weight: bold;
+      text-decoration: none;
+      color: #e05206FF;
+    }
+    #direct-link:hover { color: #c44105; }
+
+    /* Footer */
+    .footer {
+      width: 100%;
+      background: #e05206FF;
+      color: #fff;
+      text-align: center;
+      padding: 10px 15px;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      font-size: 13px;
+    }
+
+    @media (max-width: 480px) {
+      h1 { font-size: 18px; }
+      .detail { font-size: 12px; padding: 6px; }
+      .footer { font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <img src="IITA2.png" alt="ATB Logo" style="height:45px;">
+      <button class="hamburger" id="hamburger">☰</button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="home.html">Home</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="details-container">
+    <h1>ICT Maintenance Details</h1>
+    <div style="text-align:center;">
+      <a href="#" id="direct-link" target="_blank" style="color: #e05206FF;">Open Record in New Tab</a>
+    </div>
+    <div id="details">Loading...</div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    © 2025 ICT Maintenance (ATB) | All Rights Reserved
+  </footer>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDGSJ6Rux7eX7jQyIDk4J_WSmGwN_i9JjE",
+      authDomain: "iita-maintenance.firebaseapp.com",
+      projectId: "iita-maintenance",
+      storageBucket: "iita-maintenance.firebasestorage.app",
+      messagingSenderId: "545155337220",
+      appId: "1:545155337220:web:6582cfeb20de7b007ff951",
+      measurementId: "G-Y9F175HEMG"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const params = new URLSearchParams(window.location.search);
+    const docId = params.get("docId");
+    const detailsDiv = document.getElementById("details");
+    const directLink = document.getElementById("direct-link");
+
+    directLink.href = `${window.location.origin}/scan-result.html?docId=${docId}`;
+
+    // Firestore key → Display name
+   // Mapping Firestore keys -> Display labels
+const fieldMap = {
+  unit: "Unit",
+  subUnit: "Sub-Unit",
+  systemOwner: "System Owner",
+  userSupervisor: "User Supervisor",
+  systemModel: "System Type and Model",
+  serialNumber: "System Serial Number",
+  numUsers: "Number of Users",
+  deviceType: "Laptop or Desktop",
+  deviceName: "Device Name",
+  tagNo: "System Tag No",
+  systemOS: "System OS",
+  osActivation: "System OS Activation Status",
+  office: "System MS Office",
+  officeActivation: "MS Office Activation Status",
+  officeUpdate: "Office 365 Update Status",
+  diskSize: "System Hard Disk Size (GB)",
+  ramSize: "System RAM Size (GB)",
+  ramType: "System RAM Type",
+  ramSlot: "RAM Slot Available",
+  processorType: "System Processor Type",
+  processorGen: "Processor Generation",
+  processorSpeed: "Processor Speed (GHz)",
+  voipPhone: "VOIP Phone",
+  voipModel: "VOIP Phone Model",
+  voipSerial: "VOIP Phone Serial Number",
+  symantec: "Symantec Endpoint",
+  ninja: "NinjaOne Installation",
+  threeCX: "3CX Installation",
+  printerName: "Printer Name",
+  printerTag: "Printer Tag No",
+  printerType: "Printer Type",
+  scannerName: "Scanner Name",
+  scannerTag: "Scanner Tag No",
+  onedrive: "OneDrive Backup",
+  driveType: "Type of Hard Drive",
+  taskCompleted: "Select Task Completed",
+  confirmation: "Has user confirmed system working?",
+  comments: "If any other detail not listed above, please specify"
+};
+
+// Define order (using Firestore keys)
+const fieldOrder = [
+  "unit",
+  "subUnit",
+  "systemOwner",
+  "userSupervisor",
+  "systemModel",
+  "serialNumber",
+  "numUsers",
+  "deviceType",
+  "deviceName",
+  "tagNo",
+  "systemOS",
+  "osActivation",
+  "office",
+  "officeActivation",
+  "officeUpdate",
+  "diskSize",
+  "ramSize",
+  "ramType",
+  "ramSlot",
+  "processorType",
+  "processorGen",
+  "processorSpeed",
+  "voipPhone",
+  "voipModel",
+  "voipSerial",
+  "symantec",
+  "ninja",
+  "threeCX",
+  "printerName",
+  "printerTag",
+  "printerType",
+  "scannerName",
+  "scannerTag",
+  "onedrive",
+  "driveType",
+  "taskCompleted",
+  "confirmation",
+  "comments"
+];
+
+async function loadData() {
+  if (docId) {
+    const docRef = doc(db, "laptops", docId);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      let html = "";
+
+      fieldOrder.forEach(key => {
+        const label = fieldMap[key] || key; // fallback to raw key
+        const value = data[key] !== undefined ? data[key] : "-- Not Provided --";
+        html += `<div class="detail"><strong>${label}:</strong> ${value}</div>`;
+      });
+
+      detailsDiv.innerHTML = html;
+    } else {
+      detailsDiv.innerHTML = "No record found!";
+    }
+  } else {
+    detailsDiv.innerHTML = "Invalid QR code link!";
+  }
+}
+
+    loadData();
+
+    // Navbar toggle
+    const hamburger = document.getElementById("hamburger");
+    const navLinks = document.getElementById("nav-links");
+    hamburger.addEventListener("click", () => {
+      navLinks.classList.toggle("show");
+    });
+  </script>
+</body>
+</html>

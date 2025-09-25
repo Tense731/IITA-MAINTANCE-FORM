@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin - Add Problems</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f9;
+      margin: 0;
+      padding: 20px;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+    input, textarea, button {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+    button {
+      background: #6c63ff;
+      color: white;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #594ee2;
+    }
+    .message {
+      text-align: center;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    .success {
+      color: green;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <h2>Admin - Add Problem & Solutions</h2>
+  <div class="container">
+    <input type="text" id="title" placeholder="Problem Title" required>
+    <textarea id="solutions" placeholder="Enter solutions (separate by commas)" required></textarea>
+    <input type="text" id="video" placeholder="YouTube Video Link (optional)">
+    <button id="saveBtn">Save Problem</button>
+    <div class="message" id="message"></div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    // 🔹 Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyAbf5KefolQnhp_SHHRc6E6kxefaByE_d0",
+      authDomain: "laptop-reg.firebaseapp.com",
+      projectId: "laptop-reg",
+      storageBucket: "laptop-reg.appspot.com",
+      messagingSenderId: "56201137140",
+      appId: "1:56201137140:web:c1dc6916d9e943b64a87a1",
+      measurementId: "G-2J18LPQ425"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    document.getElementById("saveBtn").addEventListener("click", async () => {
+      const title = document.getElementById("title").value.trim();
+      const solutionsText = document.getElementById("solutions").value.trim();
+      const video = document.getElementById("video").value.trim();
+      const messageBox = document.getElementById("message");
+
+      if (!title || !solutionsText) {
+        messageBox.textContent = "⚠️ Please fill all required fields!";
+        messageBox.className = "message error";
+        return;
+      }
+
+      const solutionsArray = solutionsText.split(",").map(s => s.trim()).filter(s => s);
+
+      try {
+        const problemData = {
+          title: title,
+          titleLower: title.toLowerCase(), // ✅ makes searching work
+          solutions: solutionsArray,
+          video: video,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+
+        await db.collection("problems").add(problemData);
+
+        messageBox.textContent = "✅ Problem saved successfully!";
+        messageBox.className = "message success";
+
+        // clear inputs
+        document.getElementById("title").value = "";
+        document.getElementById("solutions").value = "";
+        document.getElementById("video").value = "";
+
+      } catch (err) {
+        console.error(err);
+        messageBox.textContent = "❌ Error saving problem.";
+        messageBox.className = "message error";
+      }
+    });
+  </script>
+</body>
+</html>

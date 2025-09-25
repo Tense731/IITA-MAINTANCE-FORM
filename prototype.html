@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Problem Search with Suggestions</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f0f4f8;
+    margin: 0;
+    padding: 20px;
+    color: #333;
+  }
+
+  h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    color: #6c63ff;
+  }
+
+  .search-box {
+    text-align: center;
+    position: relative;
+    max-width: 400px;
+    margin: auto;
+  }
+
+  input {
+    padding: 12px 15px;
+    width: 100%;
+    border: 2px solid #6c63ff;
+    border-radius: 8px;
+    font-size: 16px;
+    outline: none;
+    transition: border 0.3s;
+  }
+
+  input:focus {
+    border-color: #594ee2;
+  }
+
+  button {
+    padding: 12px 20px;
+    background: #6c63ff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    margin-top: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 15px;
+    transition: background 0.3s;
+  }
+
+  button:hover {
+    background: #594ee2;
+  }
+
+  .autocomplete-items {
+    position: absolute;
+    top: 55px;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 0 0 8px 8px;
+    z-index: 99;
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+
+  .autocomplete-item {
+    padding: 12px 15px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+    transition: background 0.2s;
+  }
+
+  .autocomplete-item:hover {
+    background: #f0f0f0;
+  }
+
+  .results {
+    max-width: 700px;
+    margin: 30px auto;
+  }
+
+  .problem {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    margin-bottom: 25px;
+    transition: transform 0.2s;
+  }
+
+  .problem:hover {
+    transform: translateY(-2px);
+  }
+
+  .problem h3 {
+    color: #6c63ff;
+    margin-bottom: 10px;
+  }
+
+  .problem h4 {
+    margin-bottom: 8px;
+    color: #444;
+  }
+
+  .problem ul {
+    padding-left: 20px;
+    margin-bottom: 10px;
+  }
+
+  iframe {
+    width: 100%;
+    height: 315px;
+    border: none;
+    border-radius: 10px;
+    margin-top: 10px;
+  }
+
+  @media screen and (max-width: 768px) {
+    iframe { height: 220px; }
+    input { font-size: 14px; }
+    button { font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<h2>Search System Issues</h2>
+<div class="search-box">
+  <input type="text" id="searchInput" placeholder="Enter problem title...">
+  <button id="searchBtn">Search</button>
+  <div id="suggestions" class="autocomplete-items"></div>
+</div>
+
+<div class="results" id="results"></div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyAbf5KefolQnhp_SHHRc6E6kxefaByE_d0",
+    authDomain: "laptop-reg.firebaseapp.com",
+    projectId: "laptop-reg",
+    storageBucket: "laptop-reg.appspot.com",
+    messagingSenderId: "56201137140",
+    appId: "1:56201137140:web:c1dc6916d9e943b64a87a1",
+    measurementId: "G-2J18LPQ425"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  const searchInput = document.getElementById("searchInput");
+  const resultsDiv = document.getElementById("results");
+  const suggestionsDiv = document.getElementById("suggestions");
+
+  let problemsCache = [];
+
+  async function loadProblems() {
+    const snapshot = await db.collection("problems").get();
+    problemsCache = snapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        title: data.title,
+        titleLower: data.titleLower || data.title.toLowerCase(),
+        solutions: data.solutions,
+        video: data.video
+      };
+    });
+  }
+
+  loadProblems();
+
+  searchInput.addEventListener("input", () => {
+    const query = searchInput.value.trim().toLowerCase();
+    suggestionsDiv.innerHTML = "";
+
+    if (!query) return;
+
+    const matches = problemsCache.filter(p => p.titleLower.includes(query));
+    matches.slice(0, 5).forEach(match => {
+      const item = document.createElement("div");
+      item.classList.add("autocomplete-item");
+      item.textContent = match.title;
+      item.addEventListener("click", () => {
+        searchInput.value = match.title;
+        suggestionsDiv.innerHTML = "";
+        showProblem(match);
+      });
+      suggestionsDiv.appendChild(item);
+    });
+  });
+
+  document.getElementById("searchBtn").addEventListener("click", () => {
+    const query = searchInput.value.trim().toLowerCase();
+    if (!query) return;
+    const found = problemsCache.filter(p => p.titleLower.includes(query));
+    resultsDiv.innerHTML = "";
+    if (found.length === 0) {
+      resultsDiv.innerHTML = "No results found.";
+    } else {
+      found.forEach(p => showProblem(p));
+    }
+  });
+
+  function showProblem(p) {
+    let solutionsHTML = "<ul>";
+    p.solutions.forEach(sol => solutionsHTML += `<li>${sol}</li>`);
+    solutionsHTML += "</ul>";
+
+    let videoURL = p.video || "";
+    if (videoURL.includes("watch?v=")) videoURL = videoURL.replace("watch?v=", "embed/");
+    if (videoURL.includes("youtu.be/")) videoURL = videoURL.replace("youtu.be/", "www.youtube.com/embed/");
+
+    resultsDiv.innerHTML = `
+      <div class="problem">
+        <h3>${p.title}</h3>
+        <h4>Solutions:</h4>
+        ${solutionsHTML}
+        ${videoURL ? `<h4>Video:</h4><iframe src="${videoURL}" allowfullscreen></iframe>` : ""}
+      </div>
+    `;
+  }
+</script>
+
+</body>
+</html>
