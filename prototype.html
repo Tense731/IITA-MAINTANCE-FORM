@@ -10,12 +10,41 @@
     margin: 0;
     padding: 20px;
     color: #333;
+    animation: fadeIn 0.8s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes slideInFromTop {
+    from { transform: translateY(-30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  @keyframes slideInFromLeft {
+    from { transform: translateX(-30px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
+
+  @keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-10px); }
+    60% { transform: translateY(-5px); }
   }
 
   h2 {
     text-align: center;
     margin-bottom: 25px;
     color: #6c63ff;
+    animation: slideInFromTop 0.6s ease-out 0.2s both;
   }
 
   .search-box {
@@ -23,6 +52,7 @@
     position: relative;
     max-width: 400px;
     margin: auto;
+    animation: slideInFromLeft 0.8s ease-out 0.4s both;
   }
 
   input {
@@ -32,12 +62,20 @@
     border-radius: 8px;
     font-size: 16px;
     outline: none;
-    transition: border 0.3s;
+    transition: all 0.3s ease;
   }
 
   input:focus {
     border-color: #594ee2;
+    box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.1);
+    transform: translateY(-2px);
   }
+
+  input:hover {
+    border-color: #594ee2;
+    transform: translateY(-1px);
+  }
+
 
   button {
     padding: 12px 20px;
@@ -49,11 +87,35 @@
     cursor: pointer;
     font-weight: bold;
     font-size: 15px;
-    transition: background 0.3s;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+  }
+
+  button:hover::before {
+    left: 100%;
   }
 
   button:hover {
     background: #594ee2;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(108, 99, 255, 0.3);
+  }
+
+  button:active {
+    transform: translateY(0);
+    animation: pulse 0.3s ease;
   }
 
   .autocomplete-items {
@@ -68,22 +130,27 @@
     max-height: 200px;
     overflow-y: auto;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    animation: slideInFromTop 0.3s ease-out;
   }
 
   .autocomplete-item {
     padding: 12px 15px;
     cursor: pointer;
     border-bottom: 1px solid #eee;
-    transition: background 0.2s;
+    transition: all 0.2s ease;
+    transform: translateX(0);
   }
 
   .autocomplete-item:hover {
     background: #f0f0f0;
+    transform: translateX(5px);
+    border-left: 3px solid #6c63ff;
   }
 
   .results {
     max-width: 700px;
     margin: 30px auto;
+    animation: fadeIn 1s ease-out 0.6s both;
   }
 
   .problem {
@@ -92,26 +159,43 @@
     border-radius: 12px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     margin-bottom: 25px;
-    transition: transform 0.2s;
+    transition: all 0.3s ease;
+    animation: slideInFromLeft 0.6s ease-out;
   }
 
   .problem:hover {
-    transform: translateY(-2px);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
   }
 
   .problem h3 {
     color: #6c63ff;
     margin-bottom: 10px;
+    transition: color 0.3s ease;
+  }
+
+  .problem:hover h3 {
+    color: #594ee2;
   }
 
   .problem h4 {
     margin-bottom: 8px;
     color: #444;
+    transition: color 0.3s ease;
   }
 
   .problem ul {
     padding-left: 20px;
     margin-bottom: 10px;
+  }
+
+  .problem ul li {
+    transition: transform 0.2s ease;
+    margin-bottom: 5px;
+  }
+
+  .problem:hover ul li {
+    transform: translateX(5px);
   }
 
   iframe {
@@ -120,6 +204,11 @@
     border: none;
     border-radius: 10px;
     margin-top: 10px;
+    transition: transform 0.3s ease;
+  }
+
+  iframe:hover {
+    transform: scale(1.02);
   }
 
   @media screen and (max-width: 768px) {

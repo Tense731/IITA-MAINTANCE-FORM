@@ -102,6 +102,33 @@ body {
   align-items: flex-start;
   min-height: 100vh;
   color: #333;
+  animation: fadeIn 0.8s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInFromTop {
+  from { transform: translateY(-100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slideInFromLeft {
+  from { transform: translateX(-50px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+
+@keyframes slideInRow {
+  from { transform: translateX(-20px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
 }
 
 .container {
@@ -112,6 +139,13 @@ body {
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
   width: 850px;
   max-width: 95%;
+  animation: slideInFromLeft 0.8s ease-out 0.2s both;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.container:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
 }
 
 /* Heading */
@@ -121,6 +155,7 @@ h1 {
   font-weight: 700;
   color: #2c3e50;
   margin-bottom: 20px;
+  animation: fadeIn 1s ease-out 0.5s both;
 }
 
 /* Filter section */
@@ -130,6 +165,7 @@ h1 {
   justify-content: center;
   gap: 12px;
   margin-bottom: 20px;
+  animation: fadeIn 0.8s ease-out 0.7s both;
 }
 .filter-box label {
   font-weight: 600;
@@ -140,6 +176,12 @@ h1 {
   border: 1px solid #ccc;
   border-radius: 8px;
   font-size: 14px;
+  transition: all 0.3s ease;
+}
+.filter-box input[type="date"]:focus {
+  border-color: #6c63ff;
+  box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.1);
+  transform: translateY(-2px);
 }
 .filter-box button {
   padding: 8px 18px;
@@ -148,7 +190,22 @@ h1 {
   font-size: 14px;
   cursor: pointer;
   font-weight: 600;
-  transition: 0.3s;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+.filter-box button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+.filter-box button:hover::before {
+  left: 100%;
 }
 .filter-box button:first-of-type {
   background: #6c63ff;
@@ -156,6 +213,8 @@ h1 {
 }
 .filter-box button:first-of-type:hover {
   background: #594ee2;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(108, 99, 255, 0.3);
 }
 .filter-box button:last-of-type {
   background: #27ae60;
@@ -163,6 +222,8 @@ h1 {
 }
 .filter-box button:last-of-type:hover {
   background: #219150;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
 }
 
 /* Total count */
@@ -172,6 +233,7 @@ h1 {
   font-weight: 600;
   margin-bottom: 15px;
   color: #2c3e50;
+  animation: pulse 2s ease-in-out infinite;
 }
 
 /* Table styling */
@@ -181,27 +243,38 @@ table {
   overflow: hidden;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  animation: fadeIn 1s ease-out 0.9s both;
 }
 thead {
   background: #6c63ff;
   color: #fff;
+  animation: slideInFromTop 0.6s ease-out 1s both;
 }
 thead th {
   text-align: left;
   padding: 12px 15px;
   font-size: 14px;
   font-weight: 600;
+  transition: background 0.3s ease;
+}
+thead th:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
 tbody tr {
   border-bottom: 1px solid #eee;
+  animation: slideInRow 0.5s ease-out both;
+  transition: all 0.3s ease;
 }
 tbody tr:hover {
   background: #f9f9ff;
+  transform: scale(1.01);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 tbody td {
   padding: 12px 15px;
   font-size: 14px;
   color: #333;
+  transition: color 0.3s ease;
 }
 
 /* Delete button */
@@ -214,10 +287,27 @@ tbody td {
   cursor: pointer;
   font-size: 13px;
   font-weight: 600;
-  transition: 0.3s;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+.delete-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+.delete-btn:hover::before {
+  left: 100%;
 }
 .delete-btn:hover {
   background: #c0392b;
+  transform: scale(1.05);
+  box-shadow: 0 3px 10px rgba(231, 76, 60, 0.3);
 }
 
 /* Responsive table */
